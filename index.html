@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>장비 · 자차 · 학자금 저축 트래커</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6f78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="저축">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#eceae5;--card:#f8f7f4;--ink:#1d1f22;--mute:#6b6e73;--line:#d3d0c9;--acc:#1f6f78;--acc2:#c7882b;--bar:#dcd9d2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17191b;--card:#212427;--ink:#ecebe7;--mute:#9a9da2;--line:#33373b;--acc:#4fb3bd;--acc2:#e0a84e;--bar:#33373b}}
+:root[data-theme="dark"]{--bg:#17191b;--card:#212427;--ink:#ecebe7;--mute:#9a9da2;--line:#33373b;--acc:#4fb3bd;--acc2:#e0a84e;--bar:#33373b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 "IBM Plex Sans KR",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:15px;font-weight:500;color:var(--mute);margin:0 0 14px}
+.hero{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.pct{font-size:clamp(72px,22vw,132px);font-weight:700;line-height:.9;letter-spacing:-.04em}
+.pct small{font-size:.32em;font-weight:500;letter-spacing:0;margin-left:4px;color:var(--mute)}
+.sum{padding-bottom:8px;color:var(--mute)}
+.sum b{color:var(--ink);font-weight:700}
+.strip{display:flex;gap:3px;margin:22px 0 6px}
+.strip i{flex:1;height:22px;background:var(--bar);border-radius:2px}
+.strip i.on{background:var(--acc)}
+.pace{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:22px 0 30px}
+.pace div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.pace span{display:block;color:var(--mute);font-size:13px}
+.pace strong{font-size:20px}
+input,select,button{font:inherit;color:var(--ink)}
+input,select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:9px 16px;font-weight:500;cursor:pointer}
+button.ghost{background:transparent;color:var(--mute);border:1px solid var(--line);padding:5px 10px;font-size:13px}
+.dep{display:flex;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:34px}
+.dep select{flex:2 1 160px}.dep input{flex:1 1 100px}
+h2{font-size:17px;margin:30px 0 10px}
+.g{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin-bottom:8px}
+.g .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.g .nm{font-weight:500}
+.g .pp{font-weight:700;color:var(--acc)}
+.g.done .pp{color:var(--acc2)}
+.bar{height:8px;background:var(--bar);border-radius:4px;margin:9px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:4px;transition:width .5s}
+.g.done .bar i{background:var(--acc2)}
+.meta{display:flex;gap:10px;align-items:center;color:var(--mute);font-size:13px;flex-wrap:wrap}
+.meta input{width:92px;padding:4px 8px}
+.log{list-style:none;padding:0;margin:0;color:var(--mute);font-size:14px}
+.log li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.set{display:flex;gap:10px;flex-wrap:wrap;align-items:center;color:var(--mute);font-size:13px;margin-top:34px}
+.plan{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:34px}
+.plan .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.plan .row input[type=number]{flex:1 1 140px}
+.plan .row input[type=range]{flex:1 1 140px;padding:0}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:6px 0 14px}
+.split div{background:var(--bg);border-radius:8px;padding:9px 12px}
+.split span{display:block;color:var(--mute);font-size:13px}
+.split strong{font-size:17px}
+.alloc{list-style:none;padding:0;margin:0}
+.alloc li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.alloc li em{font-style:normal;color:var(--mute)}
+.hint{color:var(--mute);font-size:13px;margin:8px 0 0}
+.warn{color:var(--acc2);font-size:13px;margin:10px 0 0}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>2027 장비 · 자차 · 학자금 저축 트래커</h1>
+<div class="hero"><div class="pct" id="pct">0<small>%</small></div><div class="sum" id="sum"></div></div>
+<div class="strip" id="strip"></div>
+<div class="pace" id="pace"></div>
+
+<div class="dep">
+  <select id="sel" aria-label="입금할 목표"></select>
+  <input id="amt" type="number" min="0" inputmode="numeric" placeholder="금액(만원)" aria-label="입금 금액(만원)">
+  <button id="add">입금 기록</button>
+</div>
+
+<h2>이번 달 수입으로 배분 추천받기</h2>
+<div class="plan">
+  <div class="row">
+    <input id="inc" type="number" min="0" inputmode="numeric" placeholder="이번 달 수입(만원)" aria-label="이번 달 수입(만원)">
+  </div>
+  <div class="row"><label for="ratio">저축 비율</label><input id="ratio" type="range" min="10" max="70" step="5" value="35"><b id="rv">35%</b></div>
+  <div id="planout"></div>
+</div>
+<div id="groups"></div>
+
+<h2>최근 기록</h2>
+<ul class="log" id="log"></ul>
+
+<div class="set">
+  <label>목표 날짜 <input type="date" id="dl"></label>
+  <button class="ghost" id="reset">전부 초기화</button>
+  <details id="bk" style="width:100%"><summary>백업 · 복원</summary>
+    <p class="hint">폰을 바꾸거나 데이터를 지우기 전에 아래 코드를 복사해서 메모 앱 등에 저장해 두세요. 복원할 때는 코드를 붙여 넣고 버튼을 누르세요.</p>
+    <textarea id="bkt" rows="5" style="width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:12px monospace"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px"><button id="bkc">코드 복사</button><button class="ghost" id="bkr">이 코드로 복원</button></div>
+    <p class="hint" id="bkm"></p>
+  </details>
+</div>
+</main>
+<script>
+var KEY="saving-tracker-v1";
+var DEF={deadline:"2031-12-31",log:[],goals:[
+ {id:"indep",group:"독립",name:"독립 자금 (보증금·이사)",target:550,saved:0,due:"2027-08-31"},
+ {id:"loan",group:"학자금",name:"학자금 대출 상환",target:890,saved:0},
+ {id:"car",group:"자차",name:"자차 마련",target:3000,saved:0,model:"seltos"},
+ {id:"a7m4",group:"장비 · 바디",name:"Sony A7M4",target:280,saved:0},
+ {id:"a7c2",group:"장비 · 바디",name:"Sony A7C II",target:290,saved:0},
+ {id:"l1",group:"장비 · 렌즈",name:"망원 줌 (70-200mm F2.8)",target:330,saved:0},
+ {id:"l2",group:"장비 · 렌즈",name:"표준 줌 (24-70mm F2.8)",target:300,saved:0},
+ {id:"l3",group:"장비 · 렌즈",name:"단렌즈 (35mm 또는 50mm F1.4)",target:200,saved:0}
+]};
+var S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
+if(!S||!S.goals)S=JSON.parse(JSON.stringify(DEF));
+var MODELS={seltos:{n:"셀토스 하이브리드",p:3000},ev3:{n:"기아 EV3",p:4200},ev5:{n:"기아 EV5",p:4700}};
+S.goals.forEach(function(g){if(g.id==="car"&&!g.model){g.model="seltos";if(g.target===1500)g.target=3000}});
+if(!S.goals.some(function(g){return g.id==="indep"}))S.goals.unshift({id:"indep",group:"독립",name:"독립 자금 (보증금·이사)",target:550,saved:0,due:"2027-08-31"});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function won(n){return Math.round(n).toLocaleString("ko-KR")+"만원"}
+function pc(g){return g.target>0?Math.min(100,g.saved/g.target*100):0}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+function dueTxt(g){
+  if(!g.due)return"";
+  var n=new Date(),d=new Date(g.due+"T00:00:00");
+  var m=(d.getFullYear()-n.getFullYear())*12+d.getMonth()-n.getMonth();
+  var r=Math.max(0,g.target-g.saved);
+  if(r<=0)return"<span>달성!</span>";
+  return"<span>"+(d.getFullYear()+"년 "+(d.getMonth()+1)+"월까지 ")+(m>0?"월 "+won(r/m):"기한 지남")+"</span>";
+}
+function render(){
+  var T=0,V=0;S.goals.forEach(function(g){T+=g.target;V+=Math.min(g.saved,g.target)});
+  var p=T>0?V/T*100:0;
+  $("pct").innerHTML=Math.floor(p)+"<small>%</small>";
+  $("sum").innerHTML="모은 금액 <b>"+won(V)+"</b><br>전체 목표 "+won(T)+" · 남은 금액 "+won(Math.max(0,T-V));
+  var st="";for(var i=0;i<20;i++)st+='<i class="'+(p>=(i+1)*5?"on":"")+'"></i>';
+  $("strip").innerHTML=st;
+
+  var now=new Date(),dl=new Date(S.deadline+"T00:00:00");
+  var months=Math.max(0,(dl.getFullYear()-now.getFullYear())*12+dl.getMonth()-now.getMonth());
+  var left=Math.max(0,T-V);
+  $("pace").innerHTML='<div><span>목표까지 남은 기간</span><strong>'+(months>0?months+"개월":"기한 지남")+'</strong></div>'+
+    '<div><span>매달 모아야 할 금액</span><strong>'+(months>0?won(left/months):"-")+'</strong></div>';
+  $("dl").value=S.deadline;
+
+  $("sel").innerHTML=S.goals.map(function(g){return'<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join("");
+
+  var order=[],seen={};S.goals.forEach(function(g){if(!seen[g.group]){seen[g.group]=1;order.push(g.group)}});
+  $("groups").innerHTML=order.map(function(gr){
+    return"<h2>"+esc(gr)+"</h2>"+S.goals.filter(function(g){return g.group===gr}).map(function(g){
+      var q=pc(g);
+      return'<div class="g'+(q>=100?" done":"")+'"><div class="top"><span class="nm">'+esc(g.name)+'</span><span class="pp">'+Math.floor(q)+'%</span></div>'+
+      (g.id==="car"?'<select data-model="1" aria-label="자차 모델">'+Object.keys(MODELS).map(function(k){return'<option value="'+k+'"'+(g.model===k?" selected":"")+'>'+MODELS[k].n+' (약 '+MODELS[k].p+'만원)</option>'}).join("")+'</select>':"")+
+      '<div class="bar"><i style="width:'+q+'%"></i></div>'+
+      '<div class="meta"><span>'+won(g.saved)+' 모음</span>'+dueTxt(g)+'<span>목표</span><input type="number" min="0" value="'+g.target+'" data-id="'+g.id+'" aria-label="'+esc(g.name)+' 목표 금액(만원)"><span>만원</span></div></div>';
+    }).join("");
+  }).join("");
+
+  plan();
+  $("log").innerHTML=S.log.length?S.log.slice(0,6).map(function(l){
+    return"<li><span>"+esc(l.d)+" · "+esc(l.n)+"</span><span>+"+won(l.a)+"</span></li>"}).join(""):"<li>아직 입금 기록이 없어요. 위에서 첫 입금을 기록해 보세요.</li>";
+}
+
+$("add").onclick=function(){
+  var a=parseFloat($("amt").value),id=$("sel").value;
+  if(!(a>0))return;
+  var g=S.goals.filter(function(x){return x.id===id})[0];
+  g.saved+=a;
+  var d=new Date();
+  S.log.unshift({d:(d.getMonth()+1)+"/"+d.getDate(),n:g.name,a:a});
+  $("amt").value="";save();render();
+};
+$("groups").addEventListener("change",function(e){
+  if(e.target.getAttribute("data-model")){var c=S.goals.filter(function(x){return x.id==="car"})[0];c.model=e.target.value;c.target=MODELS[c.model].p;save();render();return}
+  var id=e.target.getAttribute("data-id");if(!id)return;
+  var g=S.goals.filter(function(x){return x.id===id})[0];
+  g.target=Math.max(0,parseFloat(e.target.value)||0);save();render();
+});
+$("dl").onchange=function(){if(this.value){S.deadline=this.value;save();render()}};
+$("reset").onclick=function(){
+  if(this.getAttribute("data-c")!=="1"){this.setAttribute("data-c","1");this.textContent="한 번 더 누르면 초기화";return}
+  S=JSON.parse(JSON.stringify(DEF));save();render();this.removeAttribute("data-c");this.textContent="전부 초기화";
+};
+function plan(){
+  var inc=S.income||0,r=S.ratio==null?35:S.ratio;
+  if(document.activeElement!==$("inc"))$("inc").value=inc||"";
+  if(document.activeElement!==$("ratio"))$("ratio").value=r;
+  $("rv").textContent=r+"%";
+  if(!(inc>0)){$("planout").innerHTML='<p class="hint">수입을 입력하면 생활비·저축·예비비 배분과 목표별 저축액을 추천해요. 프리랜서라 수입이 들쭉날쭉하면 그 달 실제 수입으로 매달 다시 입력하세요.</p>';return}
+  var sv=inc*r/100,res=inc*0.1,live=inc-sv-res;
+  var G={};
+  S.goals.forEach(function(g){var k=g.id==="indep"?"indep":g.group.indexOf("장비")===0?"equip":g.id==="loan"?"loan":"car";G[k]=G[k]||{rem:0,due:g.due};G[k].rem+=Math.max(0,g.target-g.saved)});
+  var L={indep:"독립 자금",loan:"학자금 상환",equip:"장비",car:"자차"},W={loan:30,equip:40,car:30},A={},warn="";
+  var used=0;
+  if(G.indep&&G.indep.rem>0){
+    var n=new Date(),d=new Date(G.indep.due+"T00:00:00");
+    var m=(d.getFullYear()-n.getFullYear())*12+d.getMonth()-n.getMonth();
+    var need=m>0?G.indep.rem/m:G.indep.rem;
+    A.indep=Math.min(sv,need);used=A.indep;
+    if(need>sv)warn="독립 자금을 2027년 8월까지 채우려면 월 "+won(need)+"이 필요해요. 저축 비율을 올리거나 마감을 늦춰 보세요.";
+  }
+  var rest=sv-used,keys=["loan","equip","car"].filter(function(k){return G[k]&&G[k].rem>0}),ws=0;
+  keys.forEach(function(k){ws+=W[k]});
+  keys.forEach(function(k){A[k]=rest*W[k]/ws});
+  var rows=Object.keys(A).map(function(k){
+    var mo=A[k]>0?Math.ceil(G[k].rem/A[k]):0;
+    return"<li><span>"+L[k]+"</span><span>"+won(A[k])+" <em>"+(mo>0?"· 완료까지 약 "+mo+"개월":"")+"</em></span></li>";
+  }).join("");
+  $("planout").innerHTML='<div class="split"><div><span>생활비</span><strong>'+won(live)+'</strong></div><div><span>저축 ('+r+'%)</span><strong>'+won(sv)+'</strong></div><div><span>예비비 (10%)</span><strong>'+won(res)+'</strong></div></div>'+
+    '<ul class="alloc">'+(rows||"<li>모든 목표를 달성했어요.</li>")+'</ul>'+(warn?'<p class="warn">'+warn+'</p>':"")+
+    '<p class="hint">예비비는 장비 수리·세금·비수기 대비용이에요. 독립 자금을 먼저 채우고, 나머지는 학자금 30% · 장비 40% · 자차 30%로 나눠요.</p>';
+}
+$("inc").oninput=function(){S.income=parseFloat(this.value)||0;save();plan()};
+$("ratio").oninput=function(){S.ratio=parseInt(this.value,10);save();plan()};
+$("bk").addEventListener("toggle",function(){if(this.open)$("bkt").value=JSON.stringify(S)});
+$("bkc").onclick=function(){var t=$("bkt");t.focus();t.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}
+  if(!ok&&navigator.clipboard){navigator.clipboard.writeText(t.value);ok=true}
+  $("bkm").textContent=ok?"복사했어요.":"복사가 안 되면 코드를 길게 눌러 직접 복사하세요."};
+$("bkr").onclick=function(){try{var o=JSON.parse($("bkt").value);if(!o||!Array.isArray(o.goals))throw 0;S=o;save();render();$("bkm").textContent="복원했어요."}catch(e){$("bkm").textContent="코드가 올바르지 않아요. 복사한 코드 전체를 붙여 넣었는지 확인하세요."}};
+if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){navigator.serviceWorker.register("sw.js").catch(function(){})}
+render();
+</script>
+</body>
+</html>
